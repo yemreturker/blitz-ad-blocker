@@ -4,6 +4,8 @@ const { exec } = require('child_process');
 const fs = require('fs').promises;
 const net = require('net');
 const { promisify } = require('util');
+const path = require('path');
+const os = require('os');
 
 const execPromise = promisify(exec);
 
@@ -11,6 +13,11 @@ const execPromise = promisify(exec);
 const logInfo = (msg) => console.log(`[INFO] ${msg}`);
 const logSuccess = (msg) => console.log(`[SUCCESS] ${msg}`);
 const logError = (msg) => console.log(`[ERROR] ${msg}`);
+const logWarning = (msg) => console.log(`[WARNING] ${msg}`);
+
+// Detect platform
+const isMac = process.platform === 'darwin';
+const isWindows = process.platform === 'win32';
 
 // Check if a file exists
 async function checkFileExists(filePath) {
@@ -42,10 +49,14 @@ async function findFreePort(startPort) {
 // Terminate existing Blitz processes
 async function killBlitzProcesses() {
   try {
-    if (process.platform === 'win32') {
+    if (isWindows) {
       await execPromise('taskkill /IM Blitz.exe /F');
+    } else if (isMac) {
+      await execPromise('pkill -f "Blitz"');
     }
-  } catch (err) {}
+  } catch (err) {
+    // Ignore errors if no processes were found
+  }
 }
 
 // Initialize click listener on a page
@@ -61,15 +72,37 @@ async function setupClickListener(page) {
   }
 }
 
+// Get proper Blitz path based on platform
+function getBlitzPath(configPath) {
+  // Use the path from config if provided
+  if (configPath) {
+    return configPath;
+  }
+  
+  // If no path was provided in .env, try to use default locations
+  if (isWindows) {
+    const defaultWinPath = path.join(os.homedir(), 'AppData', 'Local', 'Programs', 'Blitz', 'Blitz.exe');
+    return defaultWinPath;
+  } else if (isMac) {
+    const defaultMacPath = '/Applications/Blitz.app/Contents/MacOS/Blitz';
+    return defaultMacPath;
+  }
+  
+  throw new Error('Unsupported platform');
+}
+
 // Main function to remove ads from Blitz
-async function removeBlitzAds(appPath) {
+async function removeBlitzAds(configAppPath) {
   let appProcess, browser, page;
   let lastRemoval = 0;
 
   try {
+    // Get appropriate Blitz path for the platform
+    const appPath = getBlitzPath(configAppPath);
+    
     // Validate Blitz executable path
     if (!(await checkFileExists(appPath))) {
-      throw new Error(`Blitz.exe not found: ${appPath}`);
+      throw new Error(`Blitz executable not found: ${appPath}`);
     }
 
     // Terminate existing Blitz processes
@@ -79,7 +112,17 @@ async function removeBlitzAds(appPath) {
     const debugPort = await findFreePort(9222);
 
     // Launch Blitz in debug mode
-    appProcess = exec(`"${appPath}" --remote-debugging-port=${debugPort}`, { windowsHide: false });
+    let launchCommand;
+    if (isWindows) {
+      launchCommand = `"${appPath}" --remote-debugging-port=${debugPort}`;
+    } else if (isMac) {
+      launchCommand = `"${appPath}" --remote-debugging-port=${debugPort}`;
+      
+      // Display warning for macOS
+      logWarning('macOS support is experimental and untested. Please report any issues.');
+    }
+
+    appProcess = exec(launchCommand, { windowsHide: false });
 
     // Wait for debug port to be ready
     await new Promise((resolve) => setTimeout(resolve, 2000));

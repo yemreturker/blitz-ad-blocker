@@ -9,11 +9,12 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
 - Triggered by user actions (clicks or navigation).
 - Minimal and clear console logs.
 - Configurable Blitz executable path via `.env`.
+- Cross-platform support for both Windows and macOS (macOS support is experimental).
 
 ## Prerequisites
 - Node.js (v16 or higher recommended).
 - Blitz application installed.
-- Windows OS (for `taskkill` command).
+- Windows or macOS operating system.
 
 ## Installation
 1. Clone the repository:
@@ -27,26 +28,45 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
    ```
 3. Create a `.env` file in the root directory and specify the Blitz executable path:
    ```env
+   # For Windows
    BLITZ_PATH=C:\\Users\\YourUsername\\AppData\\Local\\Programs\\Blitz\\Blitz.exe
+   
+   # For macOS
+   # BLITZ_PATH=/Applications/Blitz.app/Contents/MacOS/Blitz
    ```
+   If you don't specify a path, the tool will attempt to use the default installation path for your platform.
 
 ## Usage
 Run the tool:
 ```bash
 npm start
 ```
-- Make sure to run the terminal as an administrator to avoid permission issues.
+- On Windows, make sure to run the terminal as an administrator to avoid permission issues.
+- On macOS, you may need to grant Terminal permission to control the Blitz app in System Preferences > Security & Privacy > Privacy > Automation.
 - The tool connects to the Blitz app, removes ads on startup, and continues to remove ads whenever you click or navigate within the app.
 - Logs are displayed in the terminal:
    - `[INFO]`: Status updates.
    - `[SUCCESS]`: Successful ad removals.
    - `[ERROR]`: Errors.
+   - `[WARNING]`: Important notices.
 
 To stop, press `Ctrl+C` in the terminal.
 
+## Platform-Specific Notes
+
+### Windows
+- Fully tested and supported.
+- Uses `taskkill` to terminate existing Blitz processes.
+
+### macOS
+- **Experimental support**: The macOS implementation has not been extensively tested.
+- Uses `pkill` to terminate existing Blitz processes.
+- Default path is `/Applications/Blitz.app/Contents/MacOS/Blitz`.
+- Please report any issues encountered on macOS.
+
 ## Configuration
 - **Ad Selectors**: Edit `knownAdSelectors` in `index.js` to target different DOM elements.
-- **Cooldown**: Adjust the 10-second cooldown in `auto |RemoveAds` to prevent excessive removals.
+- **Cooldown**: Adjust the 1-second cooldown in `autoRemoveAds` to prevent excessive removals.
 
 ## Project Structure
 - `index.js`: Main script for ad removal.
