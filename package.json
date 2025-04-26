@@ -1,0 +1,16 @@
+{
+  "name": "blitz-ad-blocker",
+  "version": "1.0.0",
+  "description": "A tool to remove ads from the Blitz application using Puppeteer",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "dotenv": "^16.5.0",
+    "puppeteer-core": "^24.7.2"
+  },
+  "author": "",
+  "license": "MIT"
+}
