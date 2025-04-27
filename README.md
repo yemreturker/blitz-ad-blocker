@@ -4,6 +4,43 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
 
 **⚠️ Warning**: Using this tool may violate Blitz.gg's terms of service and could lead to account suspension. Use it for educational purposes only at your own risk.
 
+## Troubleshooting
+
+### Windows Administrator Issues
+If you encounter problems with administrator execution:
+
+1. **"The system cannot find the path specified" Error**
+   - This is usually caused by working directory issues when elevating privileges
+   - Try using the `direct-admin-launch.bat` script which uses absolute paths
+   - Alternatively, open Command Prompt as administrator and navigate to the exact folder path
+
+2. **Windows Security Blocks**
+   - Windows might block the elevation request. Look for security prompts.
+   - Try the direct administrator execution method described above.
+
+3. **Console Windows Closing**
+   - It's normal for consoles to close when elevating privileges.
+   - The application continues in the new administrator window.
+   - If no new window appears, try the direct-admin-launch.bat method.
+
+4. **NPM Not Found in Administrator Window**
+   - This can happen if NPM is installed under your user profile
+   - Try using the full path to npm in the batch files
+   - Or use the direct-admin-launch.bat which handles this issue
+
+### macOS Issues
+1. **Permission Denied**
+   - Ensure you've given Terminal the necessary permissions in System Preferences.
+   - Try running the Terminal as administrator: `sudo ./run-on-mac.sh`
+
+2. **Blitz Not Found**
+   - Verify your Blitz path in the `.env` file.
+   - The default path is `/Applications/Blitz.app/Contents/MacOS/Blitz`.# Blitz Ad Blocker
+
+A Node.js tool to remove advertisements from the Blitz application by manipulating its DOM using Puppeteer.
+
+**⚠️ Warning**: Using this tool may violate Blitz.gg's terms of service and could lead to account suspension. Use it for educational purposes only at your own risk.
+
 ## Features
 - Automatically removes ads based on predefined CSS selectors.
 - Triggered by user actions (clicks or navigation).
@@ -39,16 +76,32 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
 ## Usage
 
 ### Windows
-For Windows users, you can use the included batch file to automatically run with administrator privileges:
-```bash
-run-as-admin.bat
-```
+For Windows users, you have several options to run with administrator privileges:
 
-Alternatively, you can run manually:
-```bash
-npm start
-```
-Note that you should run the command prompt as administrator for best results.
+1. **Using direct-admin-launch.bat (Recommended and Most Reliable)**
+   ```
+   direct-admin-launch.bat
+   ```
+   This script uses absolute paths to ensure the application launches correctly with administrator privileges.
+
+2. **Using run-as-admin.bat**
+   ```
+   run-as-admin.bat
+   ```
+   This batch file will automatically request administrator privileges and open a new console with the proper permissions.
+
+3. **Using npm script**
+   ```
+   npm run start:admin
+   ```
+   This checks for administrator rights and requests elevation if needed.
+
+4. **Direct Administrator Execution**
+   - Right-click on Command Prompt and select "Run as administrator"
+   - Navigate to the project directory: `cd C:\path\to\blitz-ad-blocker`
+   - Run `npm start`
+
+**Note:** When using methods 1-3, a new console window with administrator privileges will open, and the original window will close after a few seconds. This is normal behavior.
 
 ### macOS
 For macOS users, you can use the shell script:
