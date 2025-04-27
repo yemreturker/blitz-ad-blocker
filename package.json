@@ -4,7 +4,8 @@
   "description": "A cross-platform tool to remove ads from the Blitz application using Puppeteer",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node src/index.js",
+    "start:admin": "node src/scripts/check-admin.js"
   },
   "dependencies": {
     "child_process": "^1.0.2",

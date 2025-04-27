@@ -37,12 +37,34 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
    If you don't specify a path, the tool will attempt to use the default installation path for your platform.
 
 ## Usage
-Run the tool:
+
+### Windows
+For Windows users, you can use the included batch file to automatically run with administrator privileges:
+```bash
+run-as-admin.bat
+```
+
+Alternatively, you can run manually:
 ```bash
 npm start
 ```
-- On Windows, make sure to run the terminal as an administrator to avoid permission issues.
-- On macOS, you may need to grant Terminal permission to control the Blitz app in System Preferences > Security & Privacy > Privacy > Automation.
+Note that you should run the command prompt as administrator for best results.
+
+### macOS
+For macOS users, you can use the shell script:
+```bash
+chmod +x run-on-mac.sh  # Only needed first time
+./run-on-mac.sh
+```
+
+Or run directly:
+```bash
+npm start
+```
+
+On macOS, you may need to grant Terminal permission to control the Blitz app in System Preferences > Security & Privacy > Privacy > Automation.
+
+### General Information
 - The tool connects to the Blitz app, removes ads on startup, and continues to remove ads whenever you click or navigate within the app.
 - Logs are displayed in the terminal:
    - `[INFO]`: Status updates.

@@ -15,6 +15,23 @@ const logSuccess = (msg) => console.log(`[SUCCESS] ${msg}`);
 const logError = (msg) => console.log(`[ERROR] ${msg}`);
 const logWarning = (msg) => console.log(`[WARNING] ${msg}`);
 
+// Check admin rights on Windows
+function checkAdminRights() {
+  if (isWindows) {
+    try {
+      // Check if we are running as administrator by trying to access a protected resource
+      execPromise('net session >nul 2>&1').then(() => {
+        logSuccess('Running with Administrator privileges.');
+      }).catch(() => {
+        logWarning('Not running as Administrator. Some features may not work correctly.');
+        logInfo('Consider using run-as-admin.bat to launch with proper privileges.');
+      });
+    } catch (err) {
+      // Ignore errors
+    }
+  }
+}
+
 // Detect platform
 const isMac = process.platform === 'darwin';
 const isWindows = process.platform === 'win32';
@@ -263,6 +280,9 @@ async function removeBlitzAds(configAppPath) {
     if (appProcess) appProcess.kill();
   }
 }
+
+// Check admin rights before starting (Windows only)
+checkAdminRights();
 
 // Start the application using path from .env
 const appPath = process.env.BLITZ_PATH;
