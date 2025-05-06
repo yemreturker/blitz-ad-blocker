@@ -6,17 +6,109 @@ echo    Blitz Ad Blocker Installer
 echo ====================================
 echo.
 
+:: Check for administrator privileges
+>nul 2>&1 net session
+if %errorlevel% neq 0 (
+    echo [WARNING] Not running with administrator privileges.
+    echo This script needs to install dependencies and may require admin rights.
+    echo.
+    echo Please run this installer as administrator.
+    echo Right-click on installer.bat and select "Run as administrator"
+    pause
+    exit /b 1
+)
+
+:: Check for winget installation
+echo Checking for winget installation...
+winget --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [WARNING] Winget is not installed or not in PATH.
+    echo.
+    echo Winget is needed to install other dependencies.
+    echo For Windows 10 version 1809 or later, you can install it from the Microsoft Store.
+    echo.
+    echo Would you like to open the Microsoft Store to install App Installer (Winget)? (Y/N)
+    set /p install_winget=
+    if /i "!install_winget!"=="Y" (
+        start ms-windows-store://pdp/?ProductId=9NBLGGH4NNS1
+        echo Please run this installer again after installing Winget.
+        pause
+        exit /b 1
+    ) else (
+        echo Skipping Winget installation.
+        echo The installer will try to continue but may fail.
+    )
+) else (
+    echo [SUCCESS] Winget is installed.
+)
+echo.
+
+:: Check for Git installation
+echo Checking for Git installation...
+git --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo [WARNING] Git is not installed or not in PATH.
+    echo.
+    echo Would you like to install Git? (Y/N)
+    set /p install_git=
+    if /i "!install_git!"=="Y" (
+        echo Installing Git...
+        winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements
+        
+        if %errorlevel% neq 0 (
+            echo [ERROR] Failed to install Git.
+            echo Please install Git manually from https://git-scm.com/downloads
+            echo Then run this installer again.
+            pause
+            exit /b 1
+        )
+        
+        echo [SUCCESS] Git installed successfully.
+        echo Refreshing environment variables...
+        :: Refresh environment PATH to include Git
+        call :refresh_env
+    ) else (
+        echo Skipping Git installation.
+        echo The installer will try to continue but may fail if Git is required.
+    )
+) else (
+    echo [SUCCESS] Git is installed.
+)
+echo.
+
 :: Check for Node.js installation
 echo Checking for Node.js installation...
 node --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [ERROR] Node.js is not installed or not in PATH.
-    echo Please install Node.js from https://nodejs.org/
-    echo After installing Node.js, run this installer again.
-    pause
-    exit /b 1
+    echo [WARNING] Node.js is not installed or not in PATH.
+    echo.
+    echo Would you like to install Node.js? (Y/N)
+    set /p install_node=
+    if /i "!install_node!"=="Y" (
+        echo Installing Node.js...
+        winget install --id OpenJS.NodeJS.LTS -e --accept-source-agreements --accept-package-agreements
+        
+        if %errorlevel% neq 0 (
+            echo [ERROR] Failed to install Node.js.
+            echo Please install Node.js manually from https://nodejs.org/
+            echo Then run this installer again.
+            pause
+            exit /b 1
+        )
+        
+        echo [SUCCESS] Node.js installed successfully.
+        echo Refreshing environment variables...
+        :: Refresh environment PATH to include Node.js
+        call :refresh_env
+    ) else (
+        echo Skipping Node.js installation.
+        echo Cannot continue without Node.js.
+        pause
+        exit /b 1
+    )
+) else (
+    echo [SUCCESS] Node.js is installed.
 )
-echo [SUCCESS] Node.js is installed.
 echo.
 
 :: Get Blitz installation path
@@ -115,3 +207,10 @@ echo       You need administrator privileges to use this tool.
 echo.
 
 pause
+exit /b 0
+
+:: Function to refresh environment variables
+:refresh_env
+for /f "tokens=2* delims= " %%a in ('reg query HKLM\SYSTEM\CurrentControlSet\Control\Session" "Manager\Environment /v Path') do set "PATH=%%b"
+for /f "tokens=2* delims= " %%a in ('reg query HKCU\Environment /v Path') do set "PATH=!PATH!;%%b"
+goto :eof

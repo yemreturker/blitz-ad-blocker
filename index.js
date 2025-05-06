@@ -207,10 +207,10 @@ async function removeBlitzAds(configAppPath) {
 
     // Known ad selectors
     const knownAdSelectors = [
-      '#main-content div.🤑-container',
-      '#main-content > div.⚡b5a12479',
-      "#main-content > div.🤑-column",
-      '#main-content div.placeholder',
+      'div.🤑-container',
+      'div.⚡b5a12479',
+      'div.🤑-column',
+      'div.placeholder',
     ];
 
     // Automatically remove known ads
