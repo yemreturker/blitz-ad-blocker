@@ -6,6 +6,13 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
 
 ## Troubleshooting
 
+### Common Issues
+
+1. **"Failed to execute 'insertBefore' on 'Node'" Error**
+   - **Fixed in v1.2.0**: The tool now hides ad elements instead of removing them from the DOM
+   - This prevents DOM manipulation conflicts with Blitz's React framework
+   - If you still encounter this issue, please report it on GitHub
+
 ### Windows Administrator Issues
 If you encounter problems with administrator execution:
 
@@ -42,11 +49,12 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
 **⚠️ Warning**: Using this tool may violate Blitz.gg's terms of service and could lead to account suspension. Use it for educational purposes only at your own risk.
 
 ## Features
-- Automatically removes ads based on predefined CSS selectors.
-- Triggered by user actions (clicks or navigation).
-- Minimal and clear console logs.
-- Configurable Blitz executable path via `.env`.
-- Cross-platform support for both Windows and macOS (macOS support is experimental).
+- **Network-level ad blocking**: Intercepts and blocks ad requests before they load (Amazon Ads, Google Ads, etc.)
+- **DOM-based ad removal**: Removes ad elements from the page using CSS selectors
+- Triggered by user actions (clicks or navigation)
+- Minimal and clear console logs
+- Configurable Blitz executable path via `.env`
+- Cross-platform support for both Windows and macOS (macOS support is experimental)
 
 ## Prerequisites
 - Node.js (v16 or higher recommended).
@@ -140,8 +148,16 @@ To stop, press `Ctrl+C` in the terminal.
 - Please report any issues encountered on macOS.
 
 ## Configuration
+- **Blocked Domains**: Edit `blockedDomains` array in `index.js` to block additional ad networks.
+- **Blocked Patterns**: Edit `blockedPatterns` array in `index.js` to block URLs matching specific patterns.
 - **Ad Selectors**: Edit `knownAdSelectors` in `index.js` to target different DOM elements.
 - **Cooldown**: Adjust the 1-second cooldown in `autoRemoveAds` to prevent excessive removals.
+
+### Currently Blocked Networks
+- Amazon Advertising System (aax.amazon-adsystem.com)
+- Google DoubleClick
+- Google Ad Services
+- Blitz internal ads
 
 ## Project Structure
 - `index.js`: Main script for ad removal.

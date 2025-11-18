@@ -76,13 +76,53 @@ async function killBlitzProcesses() {
   }
 }
 
-// Initialize click listener on a page
+// Initialize click listener and mutation observer on a page
 async function setupClickListener(page) {
   try {
     await page.evaluate(() => {
       document.addEventListener('click', () => {
         window._triggerAdRemoval = true;
       });
+
+      // Setup MutationObserver to watch for new ad elements
+      if (!window._adObserverSetup) {
+        const adSelectors = [
+          '.🤑-container',
+          '.⚡b5a12479',
+          '.🤑-column',
+          '.placeholder',
+        ];
+
+        const observer = new MutationObserver((mutations) => {
+          let foundAds = false;
+          mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+              if (node.nodeType === 1) { // Element node
+                adSelectors.forEach((selector) => {
+                  if (node.matches && node.matches(selector)) {
+                    foundAds = true;
+                  }
+                  // Check children
+                  if (node.querySelectorAll) {
+                    const children = node.querySelectorAll(selector);
+                    if (children.length > 0) foundAds = true;
+                  }
+                });
+              }
+            });
+          });
+          if (foundAds) {
+            window._triggerAdRemoval = true;
+          }
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+        });
+
+        window._adObserverSetup = true;
+      }
     });
   } catch (err) {
     logError(`Failed to setup click listener: ${err.message}`);
@@ -161,6 +201,47 @@ async function removeBlitzAds(configAppPath) {
       throw new Error('Failed to connect to Blitz.');
     }
 
+    // Blocked domains and patterns for network requests
+    const blockedDomains = [
+      'aax.amazon-adsystem.com',
+      'amazon-adsystem.com',
+      'ads.blitz.gg',
+      'doubleclick.net',
+      'googlesyndication.com',
+      'googleadservices.com',
+    ];
+
+    const blockedPatterns = [
+      '/e/dtb/bid',
+      '/ads/',
+      '/ad/',
+      '/banner',
+    ];
+
+    // Setup request interception for a page
+    async function setupRequestInterception(page) {
+      try {
+        await page.setRequestInterception(true);
+
+        page.on('request', (request) => {
+          const url = request.url();
+          const shouldBlock = blockedDomains.some(domain => url.includes(domain)) ||
+                             blockedPatterns.some(pattern => url.includes(pattern));
+
+          if (shouldBlock) {
+            logSuccess(`Blocked: ${url}`);
+            request.abort();
+          } else {
+            request.continue();
+          }
+        });
+
+        logInfo('Network-level ad blocking enabled.');
+      } catch (err) {
+        logError(`Failed to setup request interception: ${err.message}`);
+      }
+    }
+
     // Get pages and select the main page
     async function refreshPage() {
       const pages = await browser.pages();
@@ -171,6 +252,7 @@ async function removeBlitzAds(configAppPath) {
       page = pages[0];
       try {
         await page.waitForSelector('body', { timeout: 30000 });
+        await setupRequestInterception(page);
         await setupClickListener(page);
         logInfo('Connected to Blitz page.');
       } catch (err) {
@@ -194,23 +276,40 @@ async function removeBlitzAds(configAppPath) {
           const count = await frame.evaluate((selector) => {
             const elements = document.querySelectorAll(selector);
             elements.forEach((element) => {
-              element.remove();
+              // Instead of removing, hide the element to prevent DOM manipulation errors
+              if (element && element.style) {
+                element.style.setProperty('display', 'none', 'important');
+                element.style.setProperty('visibility', 'hidden', 'important');
+                element.style.setProperty('opacity', '0', 'important');
+                element.style.setProperty('height', '0', 'important');
+                element.style.setProperty('width', '0', 'important');
+                element.style.setProperty('overflow', 'hidden', 'important');
+                element.style.setProperty('position', 'absolute', 'important');
+                element.style.setProperty('pointer-events', 'none', 'important');
+                // Mark as processed to avoid reprocessing
+                element.setAttribute('data-ad-blocked', 'true');
+              }
             });
             return elements.length;
           }, selector);
           removedCount += count;
-        } catch (err) {}
+        } catch (err) {
+          // Silently handle frame access errors
+        }
       }
 
       return removedCount;
     }
 
-    // Known ad selectors
+    // Known ad selectors - only target elements that haven't been processed yet
     const knownAdSelectors = [
-      'div.🤑-container',
-      'div.⚡b5a12479',
-      'div.🤑-column',
-      'div.placeholder',
+      'div.🤑-container:not([data-ad-blocked])',
+      'div.⚡b5a12479:not([data-ad-blocked])',
+      'div.🤑-column:not([data-ad-blocked])',
+      'div.placeholder:not([data-ad-blocked])',
+      // Add more specific ad selectors if needed
+      '[class*="ad-container"]:not([data-ad-blocked])',
+      '[id*="ad-slot"]:not([data-ad-blocked])',
     ];
 
     // Automatically remove known ads
