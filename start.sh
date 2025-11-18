@@ -22,6 +22,17 @@ if [ ! -f ".env" ]; then
     fi
 fi
 
+# Check if node_modules exists, if not run npm install
+if [ ! -d "node_modules" ]; then
+    echo "Dependencies not found. Installing..."
+    echo "This may take a minute..."
+    echo ""
+    npm install
+    echo ""
+    echo "Dependencies installed successfully!"
+    echo ""
+fi
+
 echo "Starting Blitz Ad Blocker..."
 echo ""
 npm start

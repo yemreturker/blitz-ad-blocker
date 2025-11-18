@@ -17,6 +17,17 @@ if not exist ".env" (
     )
 )
 
+:: Check if node_modules exists, if not run npm install
+if not exist "node_modules" (
+    echo Dependencies not found. Installing...
+    echo This may take a minute...
+    echo.
+    call npm install
+    echo.
+    echo Dependencies installed successfully!
+    echo.
+)
+
 :: Create a direct launcher with full paths
 echo @echo off > "%TEMP%\blitz_launcher.bat"
 echo cd /d "%PROJECT_DIR%" >> "%TEMP%\blitz_launcher.bat"

@@ -71,16 +71,14 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
    cd blitz-ad-blocker
    ```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Run the application:**
+2. **Run the application:**
    - **Windows**: Double-click `start.bat`
    - **macOS**: Double-click `start.sh` (or run `./start.sh` in Terminal)
 
-That's it! The `.env` file will be created automatically with default settings on first run.
+That's it! Everything is automatic:
+- Dependencies install automatically on first run
+- `.env` file is created automatically with default settings
+- Just double-click and go!
 
 ### Advanced Configuration (Optional)
 
