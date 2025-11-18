@@ -1,10 +1,10 @@
-require('dotenv').config(); // Load environment variables from .env
+const path = require('path');
+require('dotenv').config(); // Load environment variables from .env (silent fail if missing)
 const puppeteer = require('puppeteer-core');
 const { exec } = require('child_process');
 const fs = require('fs').promises;
 const net = require('net');
 const { promisify } = require('util');
-const path = require('path');
 const os = require('os');
 
 const execPromise = promisify(exec);

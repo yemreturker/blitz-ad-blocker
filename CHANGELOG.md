@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1] - 2025-01-18
+
+### Improved
+- **Simplified launcher scripts**:
+  - Replaced `direct-admin-launch.bat` and `run-as-admin.bat` with single `start.bat`
+  - Renamed `run-on-mac.sh` to `start.sh` for consistency
+  - Both launchers now automatically create `.env` from `.env.example` on first run
+- **Better first-time user experience**:
+  - Added `.env.example` file with helpful comments
+  - Launchers automatically configure `.env` if missing
+  - No manual configuration needed for standard installations
+- **Improved documentation**:
+  - Simplified installation instructions
+  - Clearer usage guide
+  - Removed confusing multiple options
+
+### Fixed
+- Fixed missing `.env` file error for users downloading from GitHub
+- Made dotenv configuration more robust
+
 ## [1.2.0] - 2025-01-18
 
 ### Added

@@ -62,78 +62,73 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
 - Windows or macOS operating system.
 
 ## Installation
-1. Clone the repository:
+
+### Quick Start (Recommended)
+
+1. **Download the latest release** from [Releases](https://github.com/yemreturker/blitz-ad-blocker/releases)
+   - Or clone the repository:
    ```bash
    git clone https://github.com/yemreturker/blitz-ad-blocker.git
    cd blitz-ad-blocker
    ```
-2. Install dependencies:
+
+2. **Install dependencies:**
    ```bash
    npm install
    ```
-3. Create a `.env` file in the root directory and specify the Blitz executable path:
-   ```env
-   # For Windows
-   BLITZ_PATH=C:\\Users\\YourUsername\\AppData\\Local\\Programs\\Blitz\\Blitz.exe
-   
-   # For macOS
-   # BLITZ_PATH=/Applications/Blitz.app/Contents/MacOS/Blitz
-   ```
-   If you don't specify a path, the tool will attempt to use the default installation path for your platform.
+
+3. **Run the application:**
+   - **Windows**: Double-click `start.bat`
+   - **macOS**: Double-click `start.sh` (or run `./start.sh` in Terminal)
+
+That's it! The `.env` file will be created automatically with default settings on first run.
+
+### Advanced Configuration (Optional)
+
+If Blitz is installed in a non-standard location, you can edit the `.env` file:
+
+```env
+# Windows example
+BLITZ_PATH=C:\Users\YourUsername\AppData\Local\Programs\Blitz\Blitz.exe
+
+# macOS example
+BLITZ_PATH=/Applications/Blitz.app/Contents/MacOS/Blitz
+```
+
+**Note:** Most users don't need to configure anything - the default paths work automatically!
 
 ## Usage
 
-### Windows
-For Windows users, you have several options to run with administrator privileges:
+### Starting the Ad Blocker
 
-1. **Using direct-admin-launch.bat (Recommended and Most Reliable)**
-   ```
-   direct-admin-launch.bat
-   ```
-   This script uses absolute paths to ensure the application launches correctly with administrator privileges.
+**Windows:**
+- Simply double-click `start.bat`
+- The script will request administrator privileges (required for debugging Blitz)
+- A new window will open - keep it running while using Blitz
 
-2. **Using run-as-admin.bat**
-   ```
-   run-as-admin.bat
-   ```
-   This batch file will automatically request administrator privileges and open a new console with the proper permissions.
+**macOS:**
+- Double-click `start.sh` or run `./start.sh` in Terminal
+- On first run, you may need to allow Terminal permissions in System Preferences
 
-3. **Using npm script**
-   ```
-   npm run start:admin
-   ```
-   This checks for administrator rights and requests elevation if needed.
-
-4. **Direct Administrator Execution**
-   - Right-click on Command Prompt and select "Run as administrator"
-   - Navigate to the project directory: `cd C:\path\to\blitz-ad-blocker`
-   - Run `npm start`
-
-**Note:** When using methods 1-3, a new console window with administrator privileges will open, and the original window will close after a few seconds. This is normal behavior.
-
-### macOS
-For macOS users, you can use the shell script:
-```bash
-chmod +x run-on-mac.sh  # Only needed first time
-./run-on-mac.sh
-```
-
-Or run directly:
+**Alternative (Both platforms):**
 ```bash
 npm start
 ```
 
-On macOS, you may need to grant Terminal permission to control the Blitz app in System Preferences > Security & Privacy > Privacy > Automation.
+### What Happens
 
-### General Information
-- The tool connects to the Blitz app, removes ads on startup, and continues to remove ads whenever you click or navigate within the app.
-- Logs are displayed in the terminal:
-   - `[INFO]`: Status updates.
-   - `[SUCCESS]`: Successful ad removals.
-   - `[ERROR]`: Errors.
-   - `[WARNING]`: Important notices.
+1. The tool automatically closes any running Blitz instances
+2. Relaunches Blitz in debug mode
+3. Connects to Blitz and starts blocking ads
+4. Logs appear in the console:
+   - `[INFO]` - Status updates
+   - `[SUCCESS]` - Blocked ads and network requests
+   - `[ERROR]` - Any issues encountered
+   - `[WARNING]` - Important notices
 
-To stop, press `Ctrl+C` in the terminal.
+### Stopping the Ad Blocker
+
+Press `Ctrl+C` in the terminal window to stop.
 
 ## Platform-Specific Notes
 

@@ -1,6 +1,6 @@
 {
   "name": "blitz-ad-blocker",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A cross-platform tool to remove ads from the Blitz application using Puppeteer",
   "main": "index.js",
   "scripts": {
