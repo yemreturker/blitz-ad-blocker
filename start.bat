@@ -1,11 +1,10 @@
 @echo off
-echo ====================================
-echo   Blitz Ad Blocker Launcher
-echo ====================================
-echo.
+setlocal
 
-:: Save the current directory path
+:: Get the absolute path to the current directory
 set "PROJECT_DIR=%~dp0"
+
+:: Change to the project directory
 cd /d "%PROJECT_DIR%"
 
 :: Check if .env file exists, if not create it from example
@@ -15,49 +14,20 @@ if not exist ".env" (
         copy ".env.example" ".env" >nul
         echo .env file created! Using default Blitz path.
         echo.
-    ) else (
-        echo Warning: .env.example not found. Using default Blitz path.
-        echo.
     )
 )
 
-:: Check for administrator privileges
->nul 2>&1 net session
-if %errorlevel% equ 0 (
-    echo Running with administrator privileges.
-    echo Starting Blitz Ad Blocker...
-    echo.
-    npm start
-    goto :end
-)
+:: Create a direct launcher with full paths
+echo @echo off > "%TEMP%\blitz_launcher.bat"
+echo cd /d "%PROJECT_DIR%" >> "%TEMP%\blitz_launcher.bat"
+echo title Blitz Ad Blocker >> "%TEMP%\blitz_launcher.bat"
+echo echo Starting Blitz Ad Blocker... >> "%TEMP%\blitz_launcher.bat"
+echo call npm start >> "%TEMP%\blitz_launcher.bat"
+echo pause >> "%TEMP%\blitz_launcher.bat"
 
-:: Request administrator elevation
-echo Administrator privileges required.
-echo A new window will open with elevated permissions.
-echo.
-pause
+:: Launch the batch file with admin privileges
+echo Launching Blitz Ad Blocker with administrator privileges...
+powershell -Command "Start-Process '%TEMP%\blitz_launcher.bat' -Verb RunAs"
 
-:: Create a temporary batch file to maintain the path
-set "TEMP_BATCH=%TEMP%\blitz_launcher_%RANDOM%.bat"
-echo @echo off > "%TEMP_BATCH%"
-echo cd /d "%PROJECT_DIR%" >> "%TEMP_BATCH%"
-echo title Blitz Ad Blocker >> "%TEMP_BATCH%"
-echo npm start >> "%TEMP_BATCH%"
-echo pause >> "%TEMP_BATCH%"
-
-:: Run with administrator privileges
-powershell -Command "Start-Process cmd.exe -ArgumentList '/c \"%TEMP_BATCH%\"' -Verb RunAs"
-
-if %errorlevel% equ 0 (
-    echo Administrator window opened successfully.
-) else (
-    echo Failed to request administrator privileges.
-    echo.
-    echo Alternative: Right-click Command Prompt, select "Run as administrator"
-    echo Then navigate to this folder and run: npm start
-    echo.
-    pause
-)
-
-:end
+:: Exit this script
 exit

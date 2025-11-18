@@ -65,8 +65,7 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
 
 ### Quick Start (Recommended)
 
-1. **Download the latest release** from [Releases](https://github.com/yemreturker/blitz-ad-blocker/releases)
-   - Or clone the repository:
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/yemreturker/blitz-ad-blocker.git
    cd blitz-ad-blocker
