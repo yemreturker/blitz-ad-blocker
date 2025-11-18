@@ -291,6 +291,9 @@ async function removeBlitzAds(configAppPath) {
                 element.style.setProperty('overflow', 'hidden', 'important');
                 element.style.setProperty('position', 'absolute', 'important');
                 element.style.setProperty('pointer-events', 'none', 'important');
+                element.style.setProperty('margin', '0', 'important');
+                element.style.setProperty('padding', '0', 'important');
+                element.style.setProperty('border', 'none', 'important');
                 // Mark as processed to avoid reprocessing
                 element.setAttribute('data-ad-blocked', 'true');
               }

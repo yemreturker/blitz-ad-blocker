@@ -11,6 +11,7 @@ A Node.js tool to remove advertisements from the Blitz application by manipulati
 1. **"Failed to execute 'insertBefore' on 'Node'" Error**
    - **Fixed in v1.2.0**: The tool now hides ad elements instead of removing them from the DOM
    - This prevents DOM manipulation conflicts with Blitz's React framework
+   - **v1.2.2**: Added margin, padding, and border reset to completely collapse ad spaces
    - If you still encounter this issue, please report it on GitHub
 
 ### Windows Administrator Issues
