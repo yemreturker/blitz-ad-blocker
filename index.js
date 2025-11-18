@@ -218,23 +218,28 @@ async function removeBlitzAds(configAppPath) {
       '/banner',
     ];
 
-    // Setup request interception for a page
+    // Request handler function (defined once, reused for all pages)
+    const requestHandler = (request) => {
+      const url = request.url();
+      const shouldBlock = blockedDomains.some(domain => url.includes(domain)) ||
+                         blockedPatterns.some(pattern => url.includes(pattern));
+
+      if (shouldBlock) {
+        logSuccess(`Blocked: ${url}`);
+        request.abort().catch(() => {}); // Silently handle if already handled
+      } else {
+        request.continue().catch(() => {}); // Silently handle if already handled
+      }
+    };
+
+    // Setup request interception for a page (only once per page)
     async function setupRequestInterception(page) {
       try {
+        // Remove any existing listeners first
+        page.removeAllListeners('request');
+
         await page.setRequestInterception(true);
-
-        page.on('request', (request) => {
-          const url = request.url();
-          const shouldBlock = blockedDomains.some(domain => url.includes(domain)) ||
-                             blockedPatterns.some(pattern => url.includes(pattern));
-
-          if (shouldBlock) {
-            logSuccess(`Blocked: ${url}`);
-            request.abort();
-          } else {
-            request.continue();
-          }
-        });
+        page.on('request', requestHandler);
 
         logInfo('Network-level ad blocking enabled.');
       } catch (err) {
